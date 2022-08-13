@@ -34,4 +34,4 @@ def blade_pred(input_parameters : model_input):
         return 'The blade is New'
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=8080,host='0.0.0.0',debug=True)
