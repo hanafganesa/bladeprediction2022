@@ -1,32 +1,22 @@
-from flask import Flask
-from pydantic import BaseModel
+from flask import Flask, request, jsonify
+import numpy as np
 import pickle
-import json
 
-app = Flask("__name__")
-
-class model_input(BaseModel):
-    pcut_position : int
-    psvol_position : int
-
-# load saved model
+app = Flask(__name__)
 svmodel = pickle.load(open('logreg_model.sav', 'rb'))
 
 @app.route("/")
-def hello():
+def home():
     return "Blade Prediction Model"
 
-@app.route("/blade_predict")
-def blade_pred(input_parameters : model_input):
-    input_data = input_parameters.json()
-    input_dictionary = json.loads(input_data)
+@app.route("/predict", methods=['POST'])
+def predict():
+    # print(1)
+    data = request.get_json(force=True)
+    prediction = svmodel.predict([np.array(list(data.values()))])
 
-    pcpos = input_dictionary['pcut_position']
-    pspos = input_dictionary['psvol_position']
-
-    input_list = [pcpos, pspos]
-
-    prediction = svmodel.predict([input_list])
+    # output = prediction[0]
+    # return jsonify(output)
 
     if(prediction[0] == 0):
         return 'The blade is Worn'

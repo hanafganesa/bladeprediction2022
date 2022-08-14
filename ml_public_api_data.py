@@ -2,7 +2,8 @@ import json
 from urllib import response
 import requests
 
-url = 'http://1d36-34-86-206-143.ngrok.io/blade_predict'
+
+url = 'https://blademodel-m3waowk66a-et.a.run.app/predict'
 
 # new
 input_data_for_model = {
@@ -42,6 +43,6 @@ input_data_for_model = {
 
 input_json = json.dumps(input_data_for_model)
 
-response = requests.post(url, data=input_json)
+response = requests.post(url, json=input_json)
 
 print(response.text)
