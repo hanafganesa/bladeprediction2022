@@ -2,5 +2,6 @@ albumentations
 flask
 pydantic
 requests
+pandas
 pretrainedmodels
 wtfml==0.0.2

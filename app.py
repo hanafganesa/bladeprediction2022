@@ -1,27 +1,40 @@
-from flask import Flask, request, jsonify
-import numpy as np
 import pickle
+import pandas as pd
+from flask import Flask, request, jsonify
 
+# create flask app
 app = Flask(__name__)
-svmodel = pickle.load(open('logreg_model.sav', 'rb'))
+
+# load pickle model
+model = pickle.load(open("model.pkl", "rb"))
+
 
 @app.route("/")
 def home():
     return "Blade Prediction Model"
 
-@app.route("/predict", methods=['POST'])
+
+@app.route("/predict", methods=["POST"])
 def predict():
-    # print(1)
-    data = request.get_json(force=True)
-    prediction = svmodel.predict([np.array(list(data.values()))])
+    json_ = request.json
+    query_df = pd.DataFrame(json_)
+    prediction = model.predict(query_df)
 
-    # output = prediction[0]
-    # return jsonify(output)
+    json_response = []
+    for index, row in query_df.iterrows():
+        if prediction[index] == 1:
+            condition = "The blade is New"
+        else:
+            condition = "The blade is Worn"
+        json_response.append({"pcut_position": int(row['pcut_position']),
+                              "psvol_position": int(row['psvol_position']),
+                              "prediction": int(prediction[index]),
+                              "condition": condition
+                              })
 
-    if(prediction[0] == 0):
-        return 'The blade is Worn'
-    else:
-        return 'The blade is New'
+    return jsonify(json_response)
+
 
 if __name__ == "__main__":
-    app.run(port=8080,host='0.0.0.0',debug=True)
+    # app.run(host="0.0.0.0", port=8080, debug=True)
+    app.run(debug=True)
